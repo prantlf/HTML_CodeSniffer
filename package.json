@@ -1,5 +1,5 @@
 {
-  "name": "html_codesniffer",
+  "name": "html_codesniffer-ext",
   "version": "2.2.0",
   "description": "HTML_CodeSniffer is a client-side JavaScript that checks a HTML document or source code, and detects violations of a defined coding standard.",
   "main": "index.js",

@@ -26,7 +26,7 @@ HTML\_CodeSniffer can be called in multiple ways:
 * Using npm:
 ```
 $ npm i -g npm
-$ npm i --save html_codesniffer
+$ npm i --save html_codesniffer-ext
 ```
 
 ### Licence
