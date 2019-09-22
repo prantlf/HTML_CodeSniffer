@@ -142,7 +142,7 @@ _global.HTMLCS = new function()
                 var elements = HTMLCS.util.getAllElements(element);
                 elements.unshift(element);
                 _run(elements, element, callback);
-            }
+            };
 
             // Satisfy IE which doesn't like onload being set dynamically.
             elementFrame.onreadystatechange = function() {
@@ -150,7 +150,7 @@ _global.HTMLCS = new function()
                     this.onreadystatechange = null;
                     this.load();
                 }
-            }
+            };
 
             elementFrame.onload = elementFrame.load;
 
@@ -211,7 +211,7 @@ _global.HTMLCS = new function()
         }
 
         return fullDoc;
-    }
+    };
 
     /**
      * Adds a message.
@@ -285,6 +285,8 @@ _global.HTMLCS = new function()
                 }
             }
         }//end while
+
+        _messages = _messages.concat(topMsgs);
 
         // Due to filtering of presentation roles for general sniffing these need to be handled
         // separately. The 1.3.1 sniff needs to run to detect any incorrect usage of the presentation
@@ -442,7 +444,7 @@ _global.HTMLCS = new function()
             var cb       = function() {
                 _registerSniff(standard, sniff);
                 callback.call(this);
-            }
+            };
 
             // Already loaded.
             if (sniffObj) {
@@ -605,7 +607,7 @@ _global.HTMLCS = new function()
                 script.onreadystatechange = null;
                 script.onload();
             }
-        }
+        };
 
         script.src = src;
 

@@ -191,14 +191,15 @@ _global.HTMLCS.util = function() {
      *
      * @returns {Object}
      */
-    self.style = function(element) {
+    self.style = function(element, pseudo) {
         var computedStyle = null;
         var window        = self.getElementWindow(element);
+        var pseudo        = pseudo || null;
 
         if (element.currentStyle) {
             computedStyle = element.currentStyle;
         } else if (window.getComputedStyle) {
-            computedStyle = window.getComputedStyle(element, null);
+            computedStyle = window.getComputedStyle(element, pseudo);
         }
 
         return computedStyle;
@@ -216,6 +217,12 @@ _global.HTMLCS.util = function() {
      */
     self.isVisuallyHidden = function(element) {
         var hidden = false;
+
+        // Handle titles in svg as a special visually hidden case (hidden by browsers but
+        // available to accessibility apis.
+        if (element.nodeName.toLowerCase() === 'title' && self.findParentNode(element, 'svg') !== null) {
+            return true;
+        }
 
         // Do not point to elem if its hidden. Use computed styles.
         var style = self.style(element);
@@ -240,7 +247,7 @@ _global.HTMLCS.util = function() {
      * Returns true if the element is deliberately hidden from Accessibility APIs using ARIA hidden.
      *
      * Not: This is separate to isAccessibilityHidden() due to a need to check specifically for aria hidden.
-     * 
+     *
      * @param {Node} element The element to check.
      *
      * @return {Boolean}
@@ -397,7 +404,7 @@ _global.HTMLCS.util = function() {
      * Returns all elements that are visible to the accessibility API.
      *
      * @param {Node}   element  The parent element to search.
-     * @param {String} selector Optional selector to pass to 
+     * @param {String} selector Optional selector to pass to
      *
      * @return {Array}
      */
@@ -530,13 +537,12 @@ _global.HTMLCS.util = function() {
 
         var lum = ((transformed.red * 0.2126) + (transformed.green * 0.7152) + (transformed.blue * 0.0722));
         return lum;
-    }
+    };
 
     /**
-     * Convert a colour string to a structure with red/green/blue elements.
+     * Convert a colour string to a structure with red/green/blue/alpha elements.
      *
-     * Supports rgb() and hex colours (3 or 6 hex digits, optional "#").
-     * rgba() also supported but the alpha channel is currently ignored.
+     * Supports rgb() and hex colours (3, 4, 6 or 8 hex digits, optional "#").
      * Each red/green/blue element is in the range [0.0, 1.0].
      *
      * @param {String} colour The colour to convert.
@@ -552,7 +558,11 @@ _global.HTMLCS.util = function() {
             colour = {
                 red: (matches[1] / 255),
                 green: (matches[2] / 255),
-                blue: (matches[3] / 255)
+                blue: (matches[3] / 255),
+                alpha: 1.0
+            };
+            if (matches[4]) {
+                colour.alpha = parseFloat(/^,\s*(.*)$/.exec(matches[4])[1]);
             }
         } else {
             // Hex digit format.
@@ -564,10 +574,20 @@ _global.HTMLCS.util = function() {
                 colour = colour.replace(/^(.)(.)(.)$/, '$1$1$2$2$3$3');
             }
 
+            if (colour.length === 4) {
+                colour = colour.replace(/^(.)(.)(.)(.)$/, '$1$1$2$2$3$3$4$4');
+            }
+
+            var alpha = 1; // Default if alpha is not specified
+            if (colour.length === 8) {
+                alpha = parseInt(colour.substr(6, 2), 16) / 255;
+            }
+
             colour = {
                 red: (parseInt(colour.substr(0, 2), 16) / 255),
                 green: (parseInt(colour.substr(2, 2), 16) / 255),
-                blue: (parseInt(colour.substr(4, 2), 16) / 255)
+                blue: (parseInt(colour.substr(4, 2), 16) / 255),
+                alpha: alpha,
             };
         }
 
@@ -702,34 +722,34 @@ _global.HTMLCS.util = function() {
             var interCol    = chroma * (1 - Math.abs(interHueMod - 1));
 
             switch(Math.floor(interHue)) {
-                case 0:
-                    colour.red   = chroma;
-                    colour.green = interCol;
+            case 0:
+                colour.red   = chroma;
+                colour.green = interCol;
                 break;
 
-                case 1:
-                    colour.green = chroma;
-                    colour.red   = interCol;
+            case 1:
+                colour.green = chroma;
+                colour.red   = interCol;
                 break;
 
-                case 2:
-                    colour.green = chroma;
-                    colour.blue  = interCol;
+            case 2:
+                colour.green = chroma;
+                colour.blue  = interCol;
                 break;
 
-                case 3:
-                    colour.blue  = chroma;
-                    colour.green = interCol;
+            case 3:
+                colour.blue  = chroma;
+                colour.green = interCol;
                 break;
 
-                case 4:
-                    colour.blue = chroma;
-                    colour.red  = interCol;
+            case 4:
+                colour.blue = chroma;
+                colour.red  = interCol;
                 break;
 
-                case 5:
-                    colour.red  = chroma;
-                    colour.blue = interCol;
+            case 5:
+                colour.red  = chroma;
+                colour.blue = interCol;
                 break;
             }//end switch
 
@@ -826,7 +846,7 @@ _global.HTMLCS.util = function() {
         while (node && node.parentNode) {
             cb(node);
             node = node.parentNode;
-        };
+        }
     };
 
 
@@ -898,7 +918,7 @@ _global.HTMLCS.util = function() {
             missingThId: [],
             missingTd: [],
             wrongHeaders: []
-        }
+        };
 
         var rows      = self.getChildrenForTable(element, 'tr');
         var tdCells   = {};
@@ -912,7 +932,7 @@ _global.HTMLCS.util = function() {
         var multiHeaders = {
             rows: 0,
             cols: 0
-        }
+        };
         var missingIds = false;
 
         for (var rownum = 0; rownum < rows.length; rownum++) {
@@ -1031,7 +1051,7 @@ _global.HTMLCS.util = function() {
                             element: cell,
                             expected: expected,
                             actual: (cell.getAttribute('headers') || '')
-                        }
+                        };
                         retval.wrongHeaders.push(val);
                     }
                 }//end if
@@ -1097,8 +1117,7 @@ _global.HTMLCS.util = function() {
                     if (thisCell.nodeType === 1) {
                         // Skip columns that are skipped due to rowspan.
                         if (skipCells[rownum]) {
-                            while (skipCells[rownum][0] === colnum) {
-                                skipCells[rownum].shift();
+                            while (skipCells[rownum][colnum]) {
                                 colnum++;
                             }
                         }
@@ -1116,7 +1135,7 @@ _global.HTMLCS.util = function() {
                                 }
 
                                 for (var j = colnum; j < colnum + colspan; j++) {
-                                    skipCells[i].push(j);
+                                    skipCells[i][j] = true;
                                 }
                             }
                         }
@@ -1157,7 +1176,11 @@ _global.HTMLCS.util = function() {
                                 }//end for
 
                                 if (exp.length > 0) {
-                                    exp = ' ' + exp.sort().join(' ') + ' ';
+                                    // Sort and filter expected ids by unique value.
+                                    var filteredExp = exp.sort().filter(function(value, index, self) {
+                                        return self.indexOf(value) === index;
+                                    });
+                                    exp = ' ' + filteredExp.join(' ') + ' ';
                                     exp = exp.replace(/\s+/g, ' ').replace(/(\w+\s)\1+/g, '$1').replace(/^\s*(.*?)\s*$/g, '$1');
                                     cells.push({
                                         cell: thisCell,
