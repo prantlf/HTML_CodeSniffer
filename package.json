@@ -27,19 +27,26 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/squizlabs/HTML_CodeSniffer.git"
+    "url": "https://github.com/prantlf/HTML_CodeSniffer.git"
   },
   "author": "Squiz",
+  "contributors": [
+    {
+      "name": "Ferdinand Prantl",
+      "email": "prantlf@gmail.com",
+      "url": "http://prantl.tk"
+    }
+  ],
   "bugs": {
-    "url": "https://github.com/squizlabs/HTML_CodeSniffer/issues"
+    "url": "https://github.com/prantlf/HTML_CodeSniffer/issues"
   },
   "homepage": "http://squizlabs.github.io/HTML_CodeSniffer/",
   "devDependencies": {
-    "grunt": "^1.0.3",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-eslint": "^21.0.0",
-    "grunt-contrib-watch": "^1.1.0",
-    "load-grunt-tasks": "^4.0.0",
-    "grunt-contrib-uglify": "^4.0.0"
+    "grunt": "1.0.4",
+    "grunt-contrib-copy": "1.0.0",
+    "grunt-eslint": "22.0.0",
+    "grunt-contrib-watch": "1.1.0",
+    "load-grunt-tasks": "5.1.0",
+    "grunt-contrib-uglify": "4.0.1"
   }
 }
